@@ -2,16 +2,16 @@
 
 ## Общая схема команд и событий
 
-![](aTES - Events Flow.jpg)
+![](EventsFlow.jpg)
 
 ## Accounts and Tasks
 
-![](aTES - Events Flow - Stage 1.jpg)
+![](EventsFlow-AccountsAndTasks.jpg)
 
 ## Accounting and Analytics
 
-![](aTES - Events Flow - Stage 2.jpg)
+![](EventsFlow-AccountingAndAnalytics.jpg)
 
 ## Domains and Models
 
-![](aTES - Domains_Models.jpg)
+![](Domains_Models.jpg)
