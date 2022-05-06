@@ -1,11 +1,23 @@
 version: "3.9"
+networks:
+  ates:
+    driver: bridge
+volumes:
+  v-auth-db:
+    driver: local
+  v-tasks-db:
+    driver: local
 services:
   auth-db:
     image: postgres
     volumes:
-      - ./auth/tmp/db:/var/lib/postgresql/data
+      - v-auth-db:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: password
+      POSTGRES_HOST_AUTH_METHOD: trust
+    networks:
+      - ates
+
   auth-webpack:
     build: ./auth
     command: ./bin/webpack-dev-server --inline true
@@ -13,9 +25,14 @@ services:
       - "4011:3035"
     volumes:
       - ./auth:/myapp
+    networks:
+      - ates
+
   auth:
     build: ./auth
     command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    environment:
+      AUTH_SECRET_KEY: "-----BEGIN RSA PRIVATE KEY-----\nMIIBOgIBAAJBAMPeL5veiZKnZEXm7X6tiTd0j66th4muxD/+gJjju2ePTEfkoHir\ndy30KFakNn03wZ8jIY2ETS/6Qi6WKGzNCQ8CAwEAAQJATI34D7UAEljooUWsB7ou\nCoW9bumWMyMiw1xmyNshsUyps8MUZFDHX/qrTEvmFJUo8+ZGPwrl+lk0+yWOkBku\nQQIhAPsV5V241Y/vuokxglsXmTQYGTrH7lWU24JyU7Y7JbwhAiEAx7OdBErAoPyV\nRnKGYmSeFnd3LQwnLANEaeHVCHgnny8CIBvw4tZcJD/hQJPV05jJdn4KlHwrFYWm\njArnKBOmX1uhAiBmz6WqrAF34BHJ7vQYe8yXrHGCk5snIZd7G3Tdo15iqQIhAMgR\nNZ6+zccjrxYoLJM+YyMBBAMaflbk2AEtL+BVg0UX\n-----END RSA PRIVATE KEY-----\n"
     ports:
       - "4010:3000"
     volumes:
@@ -23,21 +40,32 @@ services:
     depends_on:
       - auth-db
       - auth-webpack
+    networks:
+      - ates
+
 
   tasks-db:
     image: postgres
     volumes:
-      - ./tasks/tmp/db:/var/lib/postgresql/data
+      - v-tasks-db:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: password
+      POSTGRES_HOST_AUTH_METHOD: trust
+    networks:
+      - ates
   tasks-webpack:
     build: ./auth
     command: ./bin/webpack-dev-server --inline true
     ports:
       - "4021:3035"
+    networks:
+      - ates
+
   tasks:
     build: ./tasks
     command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    environment:
+      AUTH_PUBLIC_KEY: "-----BEGIN PUBLIC KEY-----\nMFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAMPeL5veiZKnZEXm7X6tiTd0j66th4mu\nxD/+gJjju2ePTEfkoHirdy30KFakNn03wZ8jIY2ETS/6Qi6WKGzNCQ8CAwEAAQ==\n-----END PUBLIC KEY-----\n"
     ports:
       - "4020:3000"
     volumes:
@@ -45,6 +73,9 @@ services:
     depends_on:
       - tasks-db
       - tasks-webpack
+    networks:
+      - ates
+
 
   zookeeper:
     image: confluentinc/cp-zookeeper:5.4.1
@@ -55,6 +86,8 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - ates
 
   broker:
     image: confluentinc/cp-server:5.4.1
@@ -78,3 +111,5 @@ services:
       CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
       CONFLUENT_METRICS_ENABLE: 'true'
       CONFLUENT_SUPPORT_CUSTOMER_ID: 'anonymous'
+    networks:
+      - ates
