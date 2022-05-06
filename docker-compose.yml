@@ -1,0 +1,47 @@
+version: "3.9"
+services:
+  auth-db:
+    image: postgres
+    volumes:
+      - ./auth/tmp/db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: password
+  auth-webpack:
+    build: ./auth
+    command: ./bin/webpack-dev-server --inline true
+    ports:
+      - "4011:3035"
+    volumes:
+      - ./auth:/myapp
+  auth:
+    build: ./auth
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    ports:
+      - "4010:3000"
+    volumes:
+      - ./auth:/myapp
+    depends_on:
+      - auth-db
+      - auth-webpack
+
+  tasks-db:
+    image: postgres
+    volumes:
+      - ./tasks/tmp/db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: password
+  tasks-webpack:
+    build: ./auth
+    command: ./bin/webpack-dev-server --inline true
+    ports:
+      - "4021:3035"
+  tasks:
+    build: ./tasks
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    ports:
+      - "4020:3000"
+    volumes:
+      - ./tasks:/myapp
+    depends_on:
+      - tasks-db
+      - tasks-webpack
