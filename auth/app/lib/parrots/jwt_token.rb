@@ -15,7 +15,8 @@ module Parrots
       {
         public_id: parrot.public_id,
         name: parrot.name,
-        role: parrot.role
+        role: parrot.role,
+        expires_in: 10.minutes.since.utc.to_i
       }
     end
   end
