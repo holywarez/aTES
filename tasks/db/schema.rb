@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_05_08_151257) do
+ActiveRecord::Schema.define(version: 2022_05_13_121338) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -19,6 +19,15 @@ ActiveRecord::Schema.define(version: 2022_05_08_151257) do
     t.string "name"
     t.uuid "public_id", null: false
     t.string "role"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "tasks", force: :cascade do |t|
+    t.uuid "task_public_id", default: -> { "gen_random_uuid()" }, null: false
+    t.string "name", null: false
+    t.uuid "assignee_public_id", null: false
+    t.string "status", default: "active", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end

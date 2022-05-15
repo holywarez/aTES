@@ -96,8 +96,6 @@ services:
       AUTH_URL: "http://localhost:4010/token"
       MESSAGE_BROKER: "broker:9092"
       BUNDLE_GEMFILE: "/myapp/Gemfile"
-    ports:
-      - "4020:3000"
     volumes:
       - ./tasks:/myapp
     depends_on:
