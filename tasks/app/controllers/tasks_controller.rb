@@ -5,7 +5,7 @@ class TasksController < ApplicationController
 
   # GET /tasks or /tasks.json
   def index
-    @tasks = policy_scope(Task.all)
+    @tasks = policy_scope(Task.all.order(:created_at))
   end
 
   # GET /tasks/1 or /tasks/1.json
@@ -59,7 +59,7 @@ class TasksController < ApplicationController
   end
 
   def shuffle
-    authorize(nil)
+    authorize(current_parrot)
     Tasks::ShuffleTasks.call
     redirect_to tasks_path, notice: 'Tasks are reassigned.'
   end

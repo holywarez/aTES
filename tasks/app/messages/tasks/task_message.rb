@@ -6,6 +6,7 @@ module Tasks
     def initialize(task)
       # @type [Task]
       @task = task
+      super()
     end
 
     def topic

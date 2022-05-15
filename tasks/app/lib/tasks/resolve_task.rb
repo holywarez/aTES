@@ -4,10 +4,7 @@ module Tasks
   class ResolveTask
     # @param [Task] task
     def self.call(task)
-      Task.transaction do
-        task.update(status: 'resolved')
-      end
-      ApplicationMessage.deliver(Tasks::ResolvedMessage.new(task))
+      task.update(status: 'resolved')
     end
   end
 end
