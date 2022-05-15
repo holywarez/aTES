@@ -7,6 +7,8 @@ volumes:
     driver: local
   v-tasks-db:
     driver: local
+  v-billing-db:
+    driver: local
 services:
   auth-db:
     image: postgres
@@ -96,12 +98,40 @@ services:
       AUTH_URL: "http://localhost:4010/token"
       MESSAGE_BROKER: "broker:9092"
       BUNDLE_GEMFILE: "/myapp/Gemfile"
-    ports:
-      - "4020:3000"
     volumes:
       - ./tasks:/myapp
     depends_on:
       - tasks-db
+      - broker
+    networks:
+      - ates
+
+
+
+  billing-db:
+    image: postgres
+    volumes:
+      - v-billing-db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_HOST_AUTH_METHOD: trust
+    networks:
+      - ates
+
+  billing:
+    build: ./billing
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    environment:
+      AUTH_PUBLIC_KEY: "-----BEGIN PUBLIC KEY-----\nMFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAMPeL5veiZKnZEXm7X6tiTd0j66th4mu\nxD/+gJjju2ePTEfkoHirdy30KFakNn03wZ8jIY2ETS/6Qi6WKGzNCQ8CAwEAAQ==\n-----END PUBLIC KEY-----\n"
+      AUTH_URL: "http://localhost:4010/token"
+      MESSAGE_BROKER: "broker:9092"
+      BUNDLE_GEMFILE: "/myapp/Gemfile"
+    ports:
+      - "4030:3000"
+    volumes:
+      - ./billing:/myapp
+    depends_on:
+      - billing-db
       - broker
     networks:
       - ates

@@ -1,8 +1,14 @@
 class ApplicationController < ActionController::Base
+  include Pundit::Authorization
+
   helper_method :current_parrot
 
+  def pundit_user
+    current_parrot
+  end
+
   def current_parrot
-    session[:parrot]
+    Parrots::Description.new(session[:parrot])
   end
 
   def authenticate_parrot!

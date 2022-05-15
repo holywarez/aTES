@@ -1,0 +1,16 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  host: billing-db
+  username: postgres
+  password: password
+  pool: 5
+
+development:
+  <<: *default
+  database: billing_development
+
+
+test:
+  <<: *default
+  database: billing_test
